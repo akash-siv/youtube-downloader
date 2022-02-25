@@ -57,13 +57,71 @@ def download(link):
     else:
         if a.text == "720":
             a.click()
+            time.sleep(5)
+            remove_video(link, driver, current_tab)
         elif WebDriverWait(driver, 15).until(EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, "tr:nth-child(2) td:nth-child(1) .download-link-popup-js"))).text == "720":
             WebDriverWait(driver, 15).until(EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, "tr:nth-child(2) td:nth-child(1) .download-link-popup-js"))).click()
+            time.sleep(5)
+            remove_video(link, driver, current_tab)
             time.sleep(15)
 
 
+def remove_video(remove, driver, current_tab):
+    try:
+        time.sleep(1)
+        chwd = driver.window_handles
+        for new_window in chwd:
+            # switch focus to child window
+            if (new_window != current_tab):
+                driver.close()
 
+        driver.switch_to.window(current_tab)
+        time.sleep(1)
+    except:
+        pass
+
+
+    time.sleep(1)
+    driver = webdriver.Chrome(service=s, options=chrome_options)
+    driver.get(remove)
+    time.sleep(2)
+
+    try:
+        skip_button = WebDriverWait(driver, 15).until(EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, "#skip-button\:5 .ytp-button"))).click()
+    except:
+        pass
+
+    # save = WebDriverWait(driver, 30).until(EC.element_to_be_clickable(
+    #     (By.CSS_SELECTOR, ".size-default+ .size-default .ytd-button-renderer")))
+    save = driver.find_elements(By.CSS_SELECTOR, '.size-default+ .size-default .ytd-button-renderer')
+    # save = WebDriverWait(driver, 30).until(EC.element_to_be_clickable(
+    #     (By.CLASS_NAME, "style-scope ytd-button-renderer style-default size-default")))
+
+    print(save)
+    # print(save.text)
+    try:
+        for value in save:
+            if value.text == "SAVE":
+                value.click()
+                print("video deleted")
+            # else:
+
+    except TypeError:
+        if save.text == "SAVE":
+            save.click()
+    time.sleep(1)
+    watch_later = WebDriverWait(driver, 15).until(EC.visibility_of_element_located(
+        (By.CSS_SELECTOR, "#checkboxLabel")))
+
+    try:
+        for link in watch_later:
+            if link.text == "Watch later":
+                link.click()
+    except TypeError:
+        if watch_later.text == "Watch later":
+            watch_later.click()
 
 
