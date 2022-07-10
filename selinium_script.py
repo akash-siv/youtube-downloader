@@ -7,23 +7,23 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import time
 
-
 chrome_options = Options()
 chrome_options.add_argument("--start-maximized")
 chrome_options.add_argument("--lang=en-us")
 chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:8282")
-s = Service('C:/Users/akash/PycharmProjects/youtube_downloader/chromedriver.exe')
+s = Service('./chromedriver.exe')
 driver = webdriver.Chrome(service=s, options=chrome_options)
 driver.get("https://www.youtube.com/playlist?list=WL")
 time.sleep(2)
 link_list = []
 
+
 def video_list():
     link_object = driver.find_elements_by_tag_name('a')
-    old_list= [page.get_attribute('href') for page in link_object]
+    old_list = [page.get_attribute('href') for page in link_object]
     for a in old_list:
         try:
-            if "watch" in a:
+            if ("watch" in a) and a[len(a) - 2:] != "WL":
                 link_list.append(a)
         except:
             pass
@@ -51,7 +51,7 @@ def download(link):
         driver.switch_to.window(current_tab)
         time.sleep(1)
         a = WebDriverWait(driver, 30).until(EC.visibility_of_element_located(
-        (By.CSS_SELECTOR, "tr:nth-child(3) td:nth-child(1) .download-link-popup-js")))
+            (By.CSS_SELECTOR, "tr:nth-child(3) td:nth-child(1) .download-link-popup-js")))
     except:
         pass
     else:
@@ -69,6 +69,8 @@ def download(link):
 
 
 def remove_video(remove, driver, current_tab):
+    new_driver = driver
+    new_current_tab = current_tab
     try:
         time.sleep(1)
         chwd = driver.window_handles
@@ -81,7 +83,6 @@ def remove_video(remove, driver, current_tab):
         time.sleep(1)
     except:
         pass
-
 
     time.sleep(1)
     driver = webdriver.Chrome(service=s, options=chrome_options)
@@ -100,21 +101,28 @@ def remove_video(remove, driver, current_tab):
     # save = WebDriverWait(driver, 30).until(EC.element_to_be_clickable(
     #     (By.CLASS_NAME, "style-scope ytd-button-renderer style-default size-default")))
 
-    print(save)
+    # print(save)
     # print(save.text)
     try:
         for value in save:
             if value.text == "SAVE":
                 value.click()
-                print("video deleted")
+                print("save button clicked")
             # else:
 
     except TypeError:
         if save.text == "SAVE":
             save.click()
     time.sleep(1)
-    watch_later = WebDriverWait(driver, 15).until(EC.visibility_of_element_located(
-        (By.CSS_SELECTOR, "#checkboxLabel")))
+    try:
+        watch_later = WebDriverWait(driver, 15).until(EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, "#checkboxLabel")))
+        print("video removed from watch later")
+        time.sleep(1)
+    except:
+        print("video not removed retrying")
+        remove_video(remove, new_driver, new_current_tab)
+        time.sleep(1)
 
     try:
         for link in watch_later:
@@ -123,5 +131,3 @@ def remove_video(remove, driver, current_tab):
     except TypeError:
         if watch_later.text == "Watch later":
             watch_later.click()
-
-

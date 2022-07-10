@@ -1,33 +1,16 @@
-# importing module
-import youtube_dl
-#
-
-
-# import youtube_dl
 import time
 from selinium_script import video_list, download
 
-ydl_opts = {}
+time.sleep(3)
 link_list = list(video_list())
 print(len(link_list))
 print(link_list)
 
-
 for i in link_list:
+    length = len(i)
     download(i)
 
-
-
-
-def playlist_downloader(link):
-    ydl = youtube_dl.YoutubeDL({'dump_single_json': True,
-                                'extract_flat': True})
-
-    with ydl:
-        result = ydl.download([
-            link])
-
-    print(result)
-
-# Todo: some videos not downloading issue
-# Todo: remove the downloaded video from watch later playlist
+#Todo: sometimes unable to click, save to watch later button.()
+#Todo: check the whach later if it is already unticked, if it is already unticked leave it.
+#Todo: some times ad is interupting.
+#Todo:some times the save button is clicked twice. and the menu closes before clicking the watch later button.
